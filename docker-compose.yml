@@ -1,0 +1,11 @@
+services:
+  saba-bot:
+    build: .
+    container_name: SABA_BOT
+    restart: always
+
+    volumes:
+      - .:/usr/src/bot
+
+    env_file:
+      - .env
