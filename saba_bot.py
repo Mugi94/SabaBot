@@ -15,5 +15,13 @@ async def on_ready():
     print(f'We have successfully loggged in as {client.user} (ID: {client.user.id})')
     sys.stdout.flush()
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+    
+    if message.content.lower() == 'paper boat':
+        await message.channel.send('Paper Boat!')
+
 if __name__ == "__main__":
     client.run(TOKEN)
