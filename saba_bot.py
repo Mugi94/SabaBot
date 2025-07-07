@@ -33,7 +33,8 @@ async def setup_verifier(ctx):
         title="Verification",
         description="Yaho!\nJoin the Kanikis!",
     )
-    await ctx.send(embed=embed, view=Verification())
+    await ctx.channel.send(embed=embed, view=Verification())
+    await ctx.respond('Verification is set up', ephemeral=True)
 
 if __name__ == "__main__":
     client.run(TOKEN)
