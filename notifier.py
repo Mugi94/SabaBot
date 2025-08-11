@@ -1,3 +1,5 @@
+import config
+
 class YoutubeNotifier:
     def __init__(self, client, youtube, channel_id, discord_channel_id):
         self.client = client
@@ -36,16 +38,17 @@ class YoutubeNotifier:
         channel = self.client.get_channel(self.discord_channel)
         if video_id != self.last_video:
             self.last_video = video_id
+            text = f"<@&{config.NOTIFICATION_ROLE_ID}> "
             
             match status:
                 case "upcoming":
-                    await channel.send(f"Paper Boat! A stream just got planned! {url}")
+                    await channel.send(text + f"Paper Boat! A stream just got planned! {url}")
                 
                 case "live":
-                    await channel.send(f"Yaho! I'm live! {url}")
+                    await channel.send(text + f"Yaho! I'm live! {url}")
                 
                 case "none":
-                    await channel.send(f"Yaho! {url}")
+                    await channel.send(text + f"Yaho! {url}")
                 
                 case _:
                     return

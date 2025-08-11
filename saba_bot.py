@@ -4,6 +4,7 @@ from notifier import YoutubeNotifier
 from discord import Bot, Intents, Embed
 from discord.ext import tasks
 import sys, os
+import config
 
 TOKEN = os.getenv('TOKEN')
 if not TOKEN:
@@ -23,7 +24,7 @@ notifier = YoutubeNotifier(
     client=client,
     youtube=youtube,
     channel_id="UCxsZ6NCzjU_t4YSxQLBcM5A",
-    discord_channel_id=1391371471254716488
+    discord_channel_id=config.NOTIFICATION_CHANNEL_ID
 )
 
 @client.event
@@ -31,7 +32,7 @@ async def on_ready():
     print(f'We have successfully loggged in as {client.user} (ID: {client.user.id})')
     sys.stdout.flush()
     
-    client.add_view(Verification())
+    client.add_view(Verification(config.NOTIFICATION_ROLE_ID))
     youtube_notifier.start()
 
 @client.event
