@@ -1,7 +1,7 @@
 from googleapiclient.discovery import build
 from verification import Verification
 from notifier import YoutubeNotifier
-from discord import Bot, Intents, Embed
+from discord import Bot, Intents, Embed, Option, TextChannel
 from discord.ext import tasks
 import sys, os
 import config
@@ -32,7 +32,7 @@ async def on_ready():
     print(f'We have successfully loggged in as {client.user} (ID: {client.user.id})')
     sys.stdout.flush()
     
-    client.add_view(Verification(config.NOTIFICATION_ROLE_ID))
+    client.add_view(Verification())
     youtube_notifier.start()
 
 @client.event
@@ -43,13 +43,13 @@ async def on_message(message):
     if message.content.lower() == 'paper boat':
         await message.channel.send('Paper Boat!')
 
-@client.command()
-async def setup_verifier(ctx):
+@client.command(name="setup", description="Where to add a verification ingetration")
+async def setup_verifier(ctx, channel: Option(TextChannel, "The designed channel")):
     embed = Embed(
         title="Verification",
         description="Yaho!\nJoin the Kanikis!",
     )
-    await ctx.channel.send(embed=embed, view=Verification())
+    await channel.send(embed=embed, view=Verification())
     await ctx.respond('Verification is set up', ephemeral=True)
 
 last_video_id = None
