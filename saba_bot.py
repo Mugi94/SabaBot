@@ -23,7 +23,7 @@ youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 notifier = YoutubeNotifier(
     client=client,
     youtube=youtube,
-    channel_id="UCxsZ6NCzjU_t4YSxQLBcM5A",
+    channel_id=config.YOUTUBE_CHANNEL_ID,
     discord_channel_id=config.NOTIFICATION_CHANNEL_ID
 )
 
@@ -43,7 +43,7 @@ async def on_message(message):
     if message.content.lower() == 'paper boat':
         await message.channel.send('Paper Boat!')
 
-@client.command(name="setup", description="Where to add a verification ingetration")
+@client.slash_command(name="setup", description="Where to add a verification ingetration")
 async def setup_verifier(ctx, channel: Option(TextChannel, "The designed channel")):
     embed = Embed(
         title="Verification",
