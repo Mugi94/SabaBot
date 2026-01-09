@@ -1,5 +1,7 @@
 from discord.ext import commands
-import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -7,8 +9,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'We have successfully loggged in as {self.bot.user} (ID: {self.bot.user.id})')
-        sys.stdout.flush()
+        logger.info(f'We have successfully loggged in as %s (ID: %s)', self.bot.user, self.bot.user.id)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -17,6 +18,7 @@ class Events(commands.Cog):
         
         if message.content.lower() == 'paper boat':
             await message.channel.send('Paper Boat!')
+            logger.info('Paper boat sent at %s', message.channel)
 
 def setup(bot):
     bot.add_cog(Events(bot))
