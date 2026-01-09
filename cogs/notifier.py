@@ -1,15 +1,26 @@
+from googleapiclient.discovery import build
+from discord.ext import commands, tasks
 import config
+import sys, os
 
-class YoutubeNotifier:
-    def __init__(self, client, youtube, channel_id, discord_channel_id):
-        self.client = client
-        self.youtube = youtube
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+if not YOUTUBE_API_KEY:
+    sys.exit("Missing YouTube API key")
+
+class YoutubeNotifier(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
         
-        self.channel = channel_id
-        self.discord_channel = discord_channel_id
+        self.channel = config.YOUTUBE_CHANNEL_ID
+        self.discord_channel = config.NOTIFICATION_CHANNEL_ID
         
         self.last_video = None
         self.last_video_status = None
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.check_youtube.start()
 
     def get_latest_video(self):
         request = self.youtube.search().list(
@@ -29,26 +40,27 @@ class YoutubeNotifier:
         
         return None, None
     
+    @tasks.loop(minutes=5)
     async def check_youtube(self):
         url, status = self.get_latest_video()
         if not url:
             return
         
         video_id = url.split("v=")[-1]
-        channel = self.client.get_channel(self.discord_channel)
+        channel = self.bot.get_channel(self.discord_channel)
         if video_id != self.last_video:
             self.last_video = video_id
             text = f"<@&{config.NOTIFICATION_ROLE_ID}> "
             
             match status:
                 case "upcoming":
-                    await channel.send(text + f"Paper Boat! A stream just got planned! {url}")
+                    await channel.send(f"{text} Paper Boat! A stream just got planned! {url}")
                 
                 case "live":
-                    await channel.send(text + f"Yaho! I'm live! {url}")
+                    await channel.send(f"{text} Yaho! I'm live! {url}")
                 
                 case "none":
-                    await channel.send(text + f"Yaho! {url}")
+                    await channel.send(f"{text} Yaho! {url}")
                 
                 case _:
                     return
@@ -59,3 +71,6 @@ class YoutubeNotifier:
                     await channel.send(f"Yoho! Live on! {url}")
                 
                 self.last_video_status = status
+                
+def setup(bot):
+    bot.add_cog(YoutubeNotifier(bot))
