@@ -1,22 +1,21 @@
 from discord import Bot, Intents
 import logging
-import sys, os
-    
-if not os.path.exists("logs"):
-    os.makedirs("logs")
+import logging.config
+import sys, os, json
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s:%(levelname)s:%(name)s: %(message)s',
-    handlers=[
-        logging.FileHandler('logs/discord.log', encoding='utf-8', mode='w'),
-        logging.StreamHandler()
-    ]
-)
+# Logger configuration
+os.makedirs("logs", exist_ok=True)
 
+with open('./logging.json') as config_file:
+    config = json.load(config_file)
+
+logging.config.dictConfig(config)
+logger = logging.getLogger("SabaBot")
+
+# Bot configuration
 TOKEN = os.getenv('TOKEN')
 if not TOKEN:
-    logging.error("Missing discord Token")
+    logger.critical("Missing discord Token")
     sys.exit(1)
 
 intents = Intents.default()
@@ -28,9 +27,9 @@ client = Bot(intents=intents)
 for extension in ['events', 'notifier']:
     try:
         client.load_extension(f'cogs.{extension}')
-        logging.info(f"Extension loaded: cogs.%s", extension)
+        logger.info("Extension loaded: cogs.%s", extension)
     except Exception as err:
-        logging.exception(f"Error while loading extension: %s", err)
+        logger.exception("Error while loading extension")
 
 if __name__ == "__main__":
     client.run(TOKEN)

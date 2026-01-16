@@ -9,7 +9,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        logger.info(f'We have successfully loggged in as %s (ID: %s)', self.bot.user, self.bot.user.id)
+        logger.info('We have successfully loggged in as %s (ID: %s)', self.bot.user, self.bot.user.id)
 
     @commands.Cog.listener()
     async def on_message(self, message):
